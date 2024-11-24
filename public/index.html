@@ -4,36 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Système de Scores</title>
-    <script>
-        async function fetchScore(playerName) {
-            const response = await fetch(`/score/${playerName}`);
-            const data = await response.json();
-            document.getElementById('score').innerText = data.score;
-        }
-
-        async function updateScore(playerName, increment = true) {
-            const response = await fetch('/score/update', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ playerName, increment })
-            });
-            const data = await response.json();
-            document.getElementById('score').innerText = data.score;
-        }
-
-        async function resetScore(playerName) {
-            await updateScore(playerName, false);
-        }
-    </script>
 </head>
 <body>
     <h1>Score de Joueur</h1>
     <p>Score actuel : <span id="score">0</span></p>
-    <button onclick="updateScore('zizou')">Augmenter le Score</button>
-    <button onclick="resetScore('zizou')">Réinitialiser le Score</button>
-
-    <script>
-        fetchScore('zizou');
-    </script>
+    <button id="increment">Augmenter le Score</button>
+    <button id="reset">Réinitialiser le Score</button>
+    <script src="script.js"></script>
 </body>
 </html>

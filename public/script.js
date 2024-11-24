@@ -1,48 +1,37 @@
-const playerName = "zizou"; // Nom du joueur (modifiable)
-const apiUrl = "http://localhost:5000";
-
-// Éléments du DOM
-const scoreElement = document.getElementById("score");
-const incrementButton = document.getElementById("increment");
-const resetButton = document.getElementById("reset");
-
-// Charger le score initial depuis le serveur
-const loadScore = async () => {
-  try {
-    const response = await fetch(`${apiUrl}/score/${playerName}`);
+async function fetchScore(playerName) {
+    const response = await fetch(`/score/${playerName}`);
     const data = await response.json();
-    scoreElement.textContent = data.score;
-  } catch (error) {
-    console.error("Erreur lors du chargement du score :", error);
-  }
-};
+    return data.score;
+}
 
-// Mettre à jour le score sur le serveur
-const updateScore = async (newScore) => {
-  try {
-    const response = await fetch(`${apiUrl}/score/update`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ playerName, score: newScore }),
+async function updateScore(playerName, increment = true) {
+    const response = await fetch('/score/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerName, increment })
     });
     const data = await response.json();
-    scoreElement.textContent = data.score;
-  } catch (error) {
-    console.error("Erreur lors de la mise à jour du score :", error);
-  }
-};
+    return data.score;
+}
 
-// Événements pour les boutons
-incrementButton.addEventListener("click", () => {
-  const currentScore = parseInt(scoreElement.textContent, 10);
-  updateScore(currentScore + 1);
+async function resetScore(playerName) {
+    return await updateScore(playerName, false);
+}
+
+// Gestion des actions dans le DOM
+document.addEventListener('DOMContentLoaded', async () => {
+    const playerName = 'zizou';
+    const scoreDisplay = document.getElementById('score');
+    const incrementButton = document.getElementById('increment');
+    const resetButton = document.getElementById('reset');
+
+    scoreDisplay.innerText = await fetchScore(playerName);
+
+    incrementButton.addEventListener('click', async () => {
+        scoreDisplay.innerText = await updateScore(playerName);
+    });
+
+    resetButton.addEventListener('click', async () => {
+        scoreDisplay.innerText = await resetScore(playerName);
+    });
 });
-
-resetButton.addEventListener("click", () => {
-  updateScore(0);
-});
-
-// Charger le score au démarrage
-loadScore();

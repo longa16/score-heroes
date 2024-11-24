@@ -6,7 +6,7 @@ mongoose.connect('mongodb://localhost:27017/scoresDB', { useNewUrlParser: true, 
 
 const app = express();
 app.use(bodyParser.json());
-app.use(express.static('public'));
+app.use(express.static('public')); // Servir les fichiers statiques
 
 const scoreSchema = new mongoose.Schema({
     playerName: String,
