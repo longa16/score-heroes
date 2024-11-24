@@ -1,55 +1,45 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const path = require("path"); // Utilisé pour construire des chemins
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+
+mongoose.connect('mongodb://localhost:27017/scoresDB', { useNewUrlParser: true, useUnifiedTopology: true });
 
 const app = express();
-const PORT = 5000;
+app.use(bodyParser.json());
+app.use(express.static('public'));
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+const scoreSchema = new mongoose.Schema({
+    playerName: String,
+    score: { type: Number, default: 0 }
+});
 
-// Connexion à MongoDB
-mongoose
-  .connect("mongodb://localhost:27017/scoreDB", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("MongoDB connecté"))
-  .catch((err) => console.error("Erreur de connexion à MongoDB :", err));
+const Score = mongoose.model('Score', scoreSchema);
 
-// Servir les fichiers statiques (HTML, JS, CSS)
-app.use(express.static(path.join(__dirname, "public")));
-
-// API REST pour les scores
-app.get("/score/:playerName", async (req, res) => {
-  const { playerName } = req.params;
-  try {
+// Endpoint : Récupérer le score d'un joueur
+app.get('/score/:playerName', async (req, res) => {
+    const { playerName } = req.params;
     let player = await Score.findOne({ playerName });
     if (!player) {
-      player = new Score({ playerName });
-      await player.save();
+        player = new Score({ playerName });
+        await player.save();
     }
-    res.json(player);
-  } catch (error) {
-    res.status(500).json({ message: "Erreur lors de la récupération du score", error });
-  }
+    res.json({ score: player.score });
 });
 
-app.post("/score/update", async (req, res) => {
-  const { playerName, score } = req.body;
-  try {
-    const player = await Score.findOneAndUpdate(
-      { playerName },
-      { score },
-      { new: true, upsert: true }
-    );
-    res.json(player);
-  } catch (error) {
-    res.status(500).json({ message: "Erreur lors de la mise à jour du score", error });
-  }
+// Endpoint : Mettre à jour le score
+app.post('/score/update', async (req, res) => {
+    const { playerName, increment } = req.body;
+    let player = await Score.findOne({ playerName });
+    if (!player) {
+        player = new Score({ playerName });
+    }
+
+    player.score = increment ? player.score + 1 : 0;
+    await player.save();
+    res.json({ score: player.score });
 });
 
-// Démarrer le serveur
-app.listen(PORT, () => console.log(`Serveur démarré sur le port ${PORT}`));
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log(`Serveur lancé sur http://localhost:${PORT}`);
+});
