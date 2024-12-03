@@ -4,7 +4,7 @@
     "cors": "^2.8.5",
     "express": "^4.21.1",
     "mongodb": "^6.10.0",
-    "mongoose": "^8.8.2"
+    "mongoose": "^8.8.3"
   },
   "scripts": {
     "start": "node server.js"
