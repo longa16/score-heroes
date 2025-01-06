@@ -20,7 +20,7 @@ async function resetScore(playerName) {
 
 // Gestion des actions dans le DOM
 document.addEventListener('DOMContentLoaded', async () => {
-    const playerName = 'zizou';
+    const playerName = 'longa16';
     const scoreDisplay = document.getElementById('score');
     const incrementButton = document.getElementById('increment');
     const resetButton = document.getElementById('reset');
